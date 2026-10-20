@@ -1,0 +1,151 @@
+@import "@fontsource-variable/inter";
+
+/* White on black, with frosted-glass surfaces. Always dark. */
+:root {
+  color-scheme: dark;
+  --bg: #050506;
+  --glass: rgba(22, 22, 25, 0.62);
+  --glass-strong: rgba(30, 30, 34, 0.82);
+  --glass-hover: rgba(255, 255, 255, 0.07);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --text: #f5f5f7;
+  --text-2: rgba(245, 245, 247, 0.58);
+  --text-3: rgba(245, 245, 247, 0.34);
+  --accent: #ffffff;
+  --accent-text: #050506;
+  --accent-soft: rgba(255, 255, 255, 0.1);
+  --danger: #ff6b6b;
+  --ok: #7ee2a8;
+  --radius: 16px;
+  --blur: blur(24px) saturate(140%);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --font: "Inter Variable", "Inter", "Cantarell", "Ubuntu", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Ubuntu Mono", ui-monospace, monospace;
+  /* Legacy names used across pages. */
+  --surface: var(--glass);
+  --surface-2: rgba(255, 255, 255, 0.05);
+  --border: var(--line);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 14px;
+  font-feature-settings: "cv11", "ss01";
+  letter-spacing: -0.005em;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* A soft field of light behind glass, so the blur has something to catch. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(600px 400px at 15% -10%, rgba(255, 255, 255, 0.08), transparent 70%),
+    radial-gradient(500px 500px at 110% 30%, rgba(255, 255, 255, 0.05), transparent 70%),
+    radial-gradient(700px 400px at 40% 120%, rgba(255, 255, 255, 0.04), transparent 70%),
+    var(--bg);
+}
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 15px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 500;
+}
+
+.btn:hover {
+  background: var(--glass-hover);
+  border-color: var(--line-strong);
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.btn.primary:hover {
+  background: #e9e9ec;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btn.icon-only {
+  width: 34px;
+  padding: 0;
+}
+
+kbd,
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  font: 600 11px var(--font);
+  color: var(--text);
+}
+

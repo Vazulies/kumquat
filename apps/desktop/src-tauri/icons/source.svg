@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c1c20"/>
+      <stop offset="1" stop-color="#050506"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0.04"/>
+    </linearGradient>
+    <radialGradient id="fruit" cx="0.38" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#c9c9cf"/>
+    </radialGradient>
+  </defs>
+  <rect x="64" y="64" width="896" height="896" rx="210" fill="url(#bg)"/>
+  <rect x="65" y="65" width="894" height="894" rx="209" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  <ellipse cx="500" cy="572" rx="206" ry="240" fill="url(#fruit)"/>
+  <ellipse cx="430" cy="486" rx="44" ry="72" fill="#fff" fill-opacity="0.8" transform="rotate(-20 430 486)"/>
+  <path d="M 500 334 C 508 286 536 254 580 238" stroke="#fff" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <path d="M 548 268 C 628 196 748 212 778 252 C 718 326 608 336 548 268 Z" fill="#fff" fill-opacity="0.92"/>
+</svg>

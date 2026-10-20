@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kumquat Wheel</title>
+  </head>
+  <body>
+    <div id="root" class="root closed">
+      <svg id="ring" viewBox="0 0 560 560" width="560" height="560" aria-hidden="true">
+        <defs>
+          <filter id="frost" x="0" y="0" width="560" height="560" filterUnits="userSpaceOnUse">
+            <feGaussianBlur stdDeviation="16" edgeMode="duplicate" />
+            <feColorMatrix type="saturate" values="1.4" />
+          </filter>
+          <clipPath id="glass-clip"></clipPath>
+        </defs>
+        <image id="backdrop" x="0" y="0" width="560" height="560" preserveAspectRatio="none" filter="url(#frost)" clip-path="url(#glass-clip)" />
+        <g id="segments"></g>
+      </svg>
+      <div id="keybar" class="keybar"></div>
+      <div id="labels"></div>
+      <div id="hub" class="hub"><div id="hub-main" class="hub-main"></div></div>
+    </div>
+    <script type="module" src="/src/wheel/main.ts"></script>
+  </body>
+</html>
