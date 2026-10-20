@@ -34,7 +34,10 @@ function Fetch($url, $file) {
 # Asset URL from a GitHub release (latest, or a tag), matching a regex.
 function GitHubAsset($repo, $pattern, $tag) {
     $api = if ($tag) { "https://api.github.com/repos/$repo/releases/tags/$tag" } else { "https://api.github.com/repos/$repo/releases/latest" }
-    $release = Invoke-RestMethod -Uri $api -Headers @{ 'User-Agent' = 'kumquat-fetch-binaries' }
+    $headers = @{ 'User-Agent' = 'kumquat-fetch-binaries' }
+    # Unauthenticated API calls are limited to 60 an hour, which CI runners share.
+    if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
+    $release = Invoke-RestMethod -Uri $api -Headers $headers
     $urls = $release.assets | ForEach-Object { $_.browser_download_url } | Where-Object { $_ -match $pattern }
     if (-not $urls) { throw "No asset in $repo matches $pattern" }
     # Highest version first when several match.

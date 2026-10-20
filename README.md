@@ -85,6 +85,8 @@ Untested, needs a real Windows 10/11 machine:
 - [ ] Toasts show as "Kumquat" in the installed build (relies on the installer giving the Start menu shortcut the `app.kumquat.desktop` AppUserModelID) and the *Show in Explorer* button works; dev builds show as PowerShell.
 - [ ] `cargo test smoke -- --ignored` with the Windows binaries.
 
+CI: `.github/workflows/windows.yml` runs on `windows-latest` for pushes to main, pull requests and `v*` tags. It fetches the tools, runs `cargo test --lib`, builds the installer and uploads it as the `kumquat-windows-installer` artifact; a `v*` tag also attaches it to a draft release. The conversion smoke tests run there too but may fail without LibreOffice on the runner, so they don't fail the job. That proves the installer builds; the checklist above still needs a person at a Windows machine.
+
 Checking the Windows build from Linux: `rustup target add x86_64-pc-windows-msvc`, then `cargo check --target x86_64-pc-windows-msvc` in `apps/desktop/src-tauri`. Tauri's build script wants `llvm-rc` for the exe's icon resource; `cargo check` never links, so any stand-in on `PATH` that answers `/?` with "Resource Converter" and creates the `/fo` file is enough. Linking needs the MSVC libraries (e.g. via `cargo xwin`), or just build on Windows.
 
 ## Layout
