@@ -27,7 +27,9 @@ use serde_json::Value;
 use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Manager, RunEvent, WindowEvent};
-use tauri_plugin_autostart::{MacosLauncher, ManagerExt as _};
+use tauri_plugin_autostart::MacosLauncher;
+#[cfg(not(windows))]
+use tauri_plugin_autostart::ManagerExt as _;
 use tauri_plugin_dialog::DialogExt;
 
 use crate::wheel::{Mode, WheelKind};
@@ -94,15 +96,41 @@ fn set_integration(on: bool) -> Result<integration::IntegrationStatus, String> {
     if on { integration::install() } else { integration::uninstall() }.map_err(|e| e.to_string())
 }
 
+/// Start at login: the autostart plugin on Linux (it knows about AppImages),
+/// Kumquat's own per-user entry on Windows.
+fn autostart_enabled(app: &AppHandle) -> bool {
+    #[cfg(windows)]
+    {
+        let _ = app;
+        win::autostart::is_enabled()
+    }
+    #[cfg(not(windows))]
+    {
+        app.autolaunch().is_enabled().unwrap_or(false)
+    }
+}
+
+fn set_autostart_on(app: &AppHandle, on: bool) -> Result<(), String> {
+    #[cfg(windows)]
+    {
+        let _ = app;
+        if on { win::autostart::enable() } else { win::autostart::disable() }.map_err(|e| e.to_string())
+    }
+    #[cfg(not(windows))]
+    {
+        let launcher = app.autolaunch();
+        if on { launcher.enable() } else { launcher.disable() }.map_err(|e| e.to_string())
+    }
+}
+
 #[tauri::command]
 fn get_autostart(app: AppHandle) -> bool {
-    app.autolaunch().is_enabled().unwrap_or(false)
+    autostart_enabled(&app)
 }
 
 #[tauri::command]
 fn set_autostart(app: AppHandle, on: bool) -> Result<bool, String> {
-    let launcher = app.autolaunch();
-    if on { launcher.enable() } else { launcher.disable() }.map_err(|e| e.to_string())?;
+    set_autostart_on(&app, on)?;
     Ok(on)
 }
 
@@ -129,7 +157,7 @@ fn enable_autostart_once(app: &AppHandle) {
     if cfg!(debug_assertions) || settings::get().autostart_set {
         return;
     }
-    match app.autolaunch().enable() {
+    match set_autostart_on(app, true) {
         Ok(()) => log::info!("start at login enabled"),
         Err(err) => log::warn!("could not enable start at login: {err}"),
     }

@@ -1,5 +1,6 @@
 //! The Windows backend: drag watching, Explorer and the shell.
 
+pub mod autostart;
 pub mod integration;
 pub mod shell;
 pub mod watch;
