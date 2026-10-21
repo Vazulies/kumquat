@@ -122,6 +122,20 @@ fn session_info() -> Value {
     })
 }
 
+/// Kumquat should be ready whenever the computer is: start at login by default.
+/// Done once, so turning it off in Settings sticks. Development builds are
+/// skipped, or they'd register a temporary binary.
+fn enable_autostart_once(app: &AppHandle) {
+    if cfg!(debug_assertions) || settings::get().autostart_set {
+        return;
+    }
+    match app.autolaunch().enable() {
+        Ok(()) => log::info!("start at login enabled"),
+        Err(err) => log::warn!("could not enable start at login: {err}"),
+    }
+    let _ = settings::update(|s| s.autostart_set = true);
+}
+
 fn show_settings(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("settings") {
         let _ = app.run_on_main_thread(move || {
@@ -279,6 +293,8 @@ pub fn run() {
             } else {
                 log::warn!("not an X11 session: the drag wheel is off; use the file manager shortcut instead");
             }
+
+            enable_autostart_once(&handle);
 
             let args: Vec<String> = std::env::args().skip(1).collect();
             let cwd = std::env::current_dir().unwrap_or_default();

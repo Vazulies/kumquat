@@ -39,6 +39,7 @@ export interface Settings {
   notifications: boolean;
   paused: boolean;
   onboarded: boolean;
+  autostartSet: boolean;
 }
 
 export interface ToolStatus {

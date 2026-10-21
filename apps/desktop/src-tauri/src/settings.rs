@@ -36,6 +36,8 @@ pub struct Settings {
     /// When paused, dragging files never opens the wheel.
     pub paused: bool,
     pub onboarded: bool,
+    /// Start-at-login is switched on once, on first run; after that it's the user's call.
+    pub autostart_set: bool,
 }
 
 impl Default for Settings {
@@ -53,6 +55,7 @@ impl Default for Settings {
             notifications: true,
             paused: false,
             onboarded: false,
+            autostart_set: false,
         }
     }
 }

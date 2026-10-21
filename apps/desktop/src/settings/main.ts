@@ -29,7 +29,6 @@ async function main() {
     s = await api.saveSettings({ ...s, ...patch });
     renderStatus();
   };
-  if (!s.onboarded) await save({ onboarded: true });
 
   // Header
   document.body.prepend(el("div", { class: "backdrop" }));
@@ -47,6 +46,8 @@ async function main() {
     }
   };
   renderStatus();
+  // Only now: save() calls renderStatus, which must exist first.
+  if (!s.onboarded) await save({ onboarded: true });
   root.append(
     el(
       "div",
