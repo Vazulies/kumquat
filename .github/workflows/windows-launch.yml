@@ -55,6 +55,11 @@ jobs:
           Copy-Item out.txt, err.txt out\ -ErrorAction SilentlyContinue
           Get-Content err.txt -ErrorAction SilentlyContinue | Select-Object -Last 40 | Write-Host
 
+      - name: Start at login
+        run: |
+          # Kumquat registers itself here on its first run.
+          Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" | Format-List | Out-String | Write-Host
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
