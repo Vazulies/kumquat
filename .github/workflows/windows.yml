@@ -6,6 +6,8 @@ on:
   push:
     branches: [main]
     tags: ["v*"]
+    # The website and the launch check don't change the app.
+    paths-ignore: ["apps/web/**", ".github/workflows/pages.yml", ".github/workflows/windows-launch.yml"]
   pull_request:
   workflow_dispatch:
 

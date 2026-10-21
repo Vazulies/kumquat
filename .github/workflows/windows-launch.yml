@@ -1,0 +1,62 @@
+# Installs a released Windows build on a clean runner, starts it, and records
+# what's on screen: a screenshot plus every visible window's title and text.
+# Run it by hand from the Actions tab when a Windows startup problem needs a look.
+name: Windows launch check
+
+on:
+  workflow_dispatch:
+    inputs:
+      installer_url:
+        description: Installer to test
+        default: https://github.com/Vazulies/kumquat/releases/latest/download/Kumquat_0.1.0_x64-setup.exe
+
+jobs:
+  launch:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Install
+        run: |
+          Invoke-WebRequest -Uri "${{ inputs.installer_url }}" -OutFile setup.exe -UseBasicParsing
+          Start-Process .\setup.exe -ArgumentList '/S' -Wait
+          Get-ChildItem "$env:LOCALAPPDATA\Kumquat" -ErrorAction SilentlyContinue | Select-Object Name, Length | Format-Table | Out-String | Write-Host
+
+      - name: Launch and record
+        run: |
+          $exe = Get-ChildItem "$env:LOCALAPPDATA\Kumquat", "$env:ProgramFiles\Kumquat" -Filter kumquat.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $exe) { throw "kumquat.exe not found after install" }
+          Write-Host "Starting $($exe.FullName)"
+          $env:RUST_LOG = "kumquat_lib=debug"
+          $p = Start-Process $exe.FullName -PassThru -RedirectStandardError err.txt -RedirectStandardOutput out.txt
+          Start-Sleep -Seconds 20
+          Write-Host "Still running: $(-not $p.HasExited)  Exit code: $(if ($p.HasExited) { $p.ExitCode })"
+
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+          [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+          New-Item -ItemType Directory -Force out | Out-Null
+          $bmp.Save("out\screen.png")
+
+          # Every visible top-level window, with the text of its child controls (message boxes included).
+          Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+          $root = [System.Windows.Automation.AutomationElement]::RootElement
+          $wins = $root.FindAll([System.Windows.Automation.TreeScope]::Children, [System.Windows.Automation.Condition]::TrueCondition)
+          $report = foreach ($w in $wins) {
+            $texts = $w.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition) |
+              ForEach-Object { $_.Current.Name } | Where-Object { $_ } | Select-Object -First 30
+            "== [$($w.Current.ClassName)] $($w.Current.Name) (pid $($w.Current.ProcessId))"
+            $texts | ForEach-Object { "   $_" }
+          }
+          $report | Out-File out\windows.txt
+          $report | Write-Host
+          Copy-Item out.txt, err.txt out\ -ErrorAction SilentlyContinue
+          Get-Content err.txt -ErrorAction SilentlyContinue | Select-Object -Last 40 | Write-Host
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kumquat-launch
+          path: out
